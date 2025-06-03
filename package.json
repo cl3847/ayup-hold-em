@@ -4,9 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx src/index.ts",
+    "debugger": "tsx --inspect src/index.ts",
+    "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
   "author": "Sayajiaji",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
 }
