@@ -1,12 +1,13 @@
 {
-  "name": "connections-ap",
+  "name": "ayup-hold-em",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "tsx src/index.ts",
     "debugger": "tsx --inspect src/index.ts",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "Sayajiaji",
@@ -16,10 +17,12 @@
     "discord-api-types": "^0.38.10",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
+    "pg": "^8.16.3",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
-    "@types/node": "^22.15.29"
+    "@types/node": "^22.15.29",
+    "@types/pg": "^8.15.4"
   }
 }

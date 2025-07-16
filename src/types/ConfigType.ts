@@ -3,4 +3,7 @@ export type ConfigType = {
         clientID: string; // The client ID of the bot
         guildID: string; // The guild ID of the bot
     };
+    game: {
+        startingBalance: number; // The starting balance for new users
+    };
 };
