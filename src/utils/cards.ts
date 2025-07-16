@@ -67,4 +67,13 @@ cardList.forEach(c => {
     cardMap.set(c.code, c);
 });
 
-export default {cardMap, cardList};
+/**
+ * Returns a random card from the cardList.
+ * @returns {Card} A random card object.
+ */
+const getRandomCard = (): Card => {
+    const randomIndex: number = Math.floor(Math.random() * cardList.length);
+    return cardList[randomIndex]!;
+}
+
+export {cardMap, cardList, getRandomCard};

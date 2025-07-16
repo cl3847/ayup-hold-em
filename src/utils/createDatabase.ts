@@ -1,5 +1,6 @@
 import type {PoolClient} from "pg";
 import log from "./logger";
+import {cardMap} from "./cards.ts";
 
 /**
  * Initializes the database by checking for the existence of required tables and creating them if they do not exist.
@@ -20,11 +21,25 @@ const initDb = async (pc: PoolClient) => {
         }
     };
 
+    // ensure the card enum exists
+    const cardEnumCheck = await pc.query("SELECT 1 FROM pg_type WHERE typname = 'card_code'");
+    if (cardEnumCheck.rowCount === 0) {
+        log.info("Enum 'card_code' not found. Creating...");
+        const cardCodes = Array.from(cardMap.keys());
+        const enumValues = cardCodes.map(code => `'${code}'`).join(', ');
+        const createEnumQuery = `CREATE TYPE card_code AS ENUM (${enumValues});`;
+
+        await pc.query(createEnumQuery);
+        log.success("Successfully created enum 'card_code'.");
+    }
+
     // Execute checks and creation
     await createTable('users', `
         CREATE TABLE users (
             uid TEXT PRIMARY KEY,
-            balance INT NOT NULL DEFAULT 0
+            balance INT NOT NULL DEFAULT 0,
+            hole1 card_code DEFAULT NULL,
+            hole2 card_code DEFAULT NULL
         );`
     );
 

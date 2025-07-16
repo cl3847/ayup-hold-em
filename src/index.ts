@@ -12,6 +12,7 @@ import {initDb} from "./utils/createDatabase.ts";
 import type {DAOs} from "./models/DAOs.ts";
 import UserDAO from "./handlers/UserDAO.ts";
 import Service from "./services/Service.ts";
+import {getRandomCard} from "./utils/cards.ts";
 
 require('dotenv').config();
 
@@ -24,6 +25,7 @@ async function main() {
     const pool = await databaseSetup();
     await serviceSetup(pool);
     await discordSetup();
+    log.success("Finished setup! " + getRandomCard().shortName);
 }
 
 /**
