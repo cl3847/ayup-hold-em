@@ -1,6 +1,6 @@
 import {type Card, Suit, Rank} from "../types/CardType.ts";
 
-const cards: Card[] = [
+const cardList: Card[] = [
     // DIAMONDS
     { code: "2d", suit: Suit.DIAMONDS, rank: Rank.TWO,   value: 2,  name: "Two of Diamonds",   shortName: "2♢" },
     { code: "3d", suit: Suit.DIAMONDS, rank: Rank.THREE, value: 3,  name: "Three of Diamonds", shortName: "3♢" },
@@ -62,4 +62,9 @@ const cards: Card[] = [
     { code: "As", suit: Suit.SPADES, rank: Rank.ACE,   value: 11, name: "Ace of Spades",   shortName: "A♤" },
 ];
 
-export default cards;
+const cardMap = new Map<string, Card>();
+cardList.forEach(c => {
+    cardMap.set(c.code, c);
+});
+
+export default {cardMap, cardList};

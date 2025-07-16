@@ -6,4 +6,7 @@ export type ConfigType = {
     game: {
         startingBalance: number; // The starting balance for new users
     };
+    colors: {
+        blue: number; // The color used for embeds and other UI elements
+    };
 };

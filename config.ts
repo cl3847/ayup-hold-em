@@ -9,5 +9,8 @@ export const config: ConfigType = {
     },
     "game": {
         "startingBalance": 0, // The starting balance for new users
+    },
+    "colors": {
+        "blue": 0x5865f2
     }
 };
