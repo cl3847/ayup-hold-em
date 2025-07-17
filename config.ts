@@ -10,6 +10,10 @@ export const config: ConfigType = {
     "game": {
         "startingBalance": 0, // The starting balance for new users
     },
+    "initialGameState": {
+        "day": 1, // The initial day of the game
+        "phase": 0, // The initial phase of the game
+    },
     "colors": {
         "blue": 0x5865f2
     }

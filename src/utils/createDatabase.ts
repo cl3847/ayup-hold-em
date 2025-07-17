@@ -1,6 +1,7 @@
 import type {PoolClient} from "pg";
 import log from "./logger";
 import {cardMap} from "./cards.ts";
+import {config} from "../../config.ts";
 
 /**
  * Initializes the database by checking for the existence of required tables and creating them if they do not exist.
@@ -51,8 +52,11 @@ const initDb = async (pc: PoolClient) => {
     );
 
     // check if gameState exists in objects
-    if (!await pc.query(`SELECT * FROM objects WHERE name = 'gameState';`)) {
-        await pc.query(`INSERT INTO objects (name, data) VALUES ('gameState', '{}');`);
+    const gameStateCheck = await pc.query(`SELECT * FROM objects WHERE name = 'gameState';`);
+    if (gameStateCheck.rowCount === 0) {
+        log.info("Object 'gameState' not found. Creating...");
+        await pc.query(`INSERT INTO objects (name, data) VALUES ($1, $2);`, ['gameState', config.initialGameState]);
+        log.success("Successfully created object 'gameState'.");
     }
 };
 
