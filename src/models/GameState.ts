@@ -1,4 +1,4 @@
 export interface GameState {
-    date: number;
+    day: number;
     phase: number;
 }

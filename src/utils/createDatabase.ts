@@ -51,6 +51,17 @@ const initDb = async (pc: PoolClient) => {
         );`
     );
 
+    await createTable('boards', `
+        CREATE TABLE boards (
+            day INT PRIMARY KEY,
+            flop1 card_code NOT NULL,
+            flop2 card_code NOT NULL,
+            flop3 card_code NOT NULL,
+            turn card_code NOT NULL,
+            river card_code NOT NULL
+        );`
+    );
+
     // check if gameState exists in objects
     const gameStateCheck = await pc.query(`SELECT * FROM objects WHERE name = 'gameState';`);
     if (gameStateCheck.rowCount === 0) {

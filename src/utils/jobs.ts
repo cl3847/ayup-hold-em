@@ -4,6 +4,7 @@ import Service from "../services/Service.ts";
 import log from "./logger.ts";
 import {getRandomCard, getRandomFlop} from "./cards.ts";
 import {config} from "../../config.ts";
+import type {GameState} from "../models/GameState.ts";
 
 function initJobs(client: Client) {
     cron.schedule('00 00 * * *', () => runTheFlop(client)); // draw the flop every day at midnight
@@ -21,7 +22,7 @@ async function runTheFlop(client: Client) {
             await channel.send({
                embeds: [
                     {
-                        title: `Day ${gameState.date} | Flop Draw`,
+                        title: `Day ${gameState.day} | Flop Draw`,
                         description: `FLOP: ${flop.map(card => card.shortName).join(' | ')}`,
                         color: config.colors.red
                     }
@@ -31,7 +32,7 @@ async function runTheFlop(client: Client) {
             // Update the game state to reflect the flop draw
             await Service.getInstance().game.updateGameState({
                 phase: 1, // Update to the next phase after flop
-                date: gameState.date + 1 // Increment the date
+                day: gameState.day + 1 // Increment the date
             });
         } catch (err) {
             log.error("Could not send Flop to dealer channel.");
@@ -44,7 +45,7 @@ async function runTheFlop(client: Client) {
 }
 
 async function runTheTurn(client: Client) {
-    const gameState = await Service.getInstance().game.getGameState();
+    const gameState: GameState = await Service.getInstance().game.getGameState();
     if (gameState.phase === 1) { // The flop is done
         const turn = getRandomCard(); // implement this function to get a random turn card
         try {
@@ -52,7 +53,7 @@ async function runTheTurn(client: Client) {
             await channel.send({
                 embeds: [
                     {
-                        title: `Day ${gameState.date} | Turn Draw`,
+                        title: `Day ${gameState.day} | Turn Draw`,
                         description: `THE TURN: ${turn.shortName}`,
                         color: config.colors.red
                     }
@@ -62,7 +63,7 @@ async function runTheTurn(client: Client) {
             // Update the game state to reflect the turn draw
             await Service.getInstance().game.updateGameState({
                 phase: 2, // Update to the next phase after turn
-                date: gameState.date
+                day: gameState.day
             });
         } catch (err) {
             log.error("Could not send Turn to dealer channel.");
@@ -83,7 +84,7 @@ async function runTheRiver(client: Client) {
             await channel.send({
                 embeds: [
                     {
-                        title: `Day ${gameState.date} | River Draw`,
+                        title: `Day ${gameState.day} | River Draw`,
                         description: `RIVER: ${river.shortName}`,
                         color: config.colors.red
                     }
@@ -93,7 +94,7 @@ async function runTheRiver(client: Client) {
             // Update the game state to reflect the river draw
             await Service.getInstance().game.updateGameState({
                 phase: 0, // Reset to the initial phase after river
-                date: gameState.date
+                day: gameState.day
             });
         } catch (err) {
             log.error("Could not send River to dealer channel.");
