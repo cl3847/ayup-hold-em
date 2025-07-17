@@ -13,6 +13,8 @@ import type {DAOs} from "./models/DAOs.ts";
 import UserDAO from "./handlers/UserDAO.ts";
 import Service from "./services/Service.ts";
 import {getRandomCard} from "./utils/cards.ts";
+import ObjectDAO from "./handlers/ObjectDAO.ts";
+import initJobs from "./utils/jobs.ts";
 
 require('dotenv').config();
 
@@ -24,7 +26,8 @@ async function main() {
 
     const pool = await databaseSetup();
     await serviceSetup(pool);
-    await discordSetup();
+    const client = await discordSetup();
+    initJobs(client);
     log.success("Finished setup! " + getRandomCard().shortName);
 }
 
@@ -67,6 +70,7 @@ async function databaseSetup(): Promise<Pool> {
 async function serviceSetup(pool: Pool) {
     const daos: DAOs = {
         users: new UserDAO(),
+        objects: new ObjectDAO(),
     }
     await Service.init(daos, pool);
 }
@@ -74,7 +78,7 @@ async function serviceSetup(pool: Pool) {
 /**
  * Sets up the Discord bot, registers commands, and handles interactions.
  */
-async function discordSetup(): Promise<void> {
+async function discordSetup(): Promise<Client> {
     const client = new Client({
         intents: [IntentsBitField.Flags.Guilds],
     });
@@ -151,6 +155,8 @@ async function discordSetup(): Promise<void> {
     } catch (error) {
         log.error(error);
     }
+
+    return client;
 }
 
 main();

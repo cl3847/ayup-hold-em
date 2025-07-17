@@ -1,9 +1,11 @@
 import type {Pool} from "pg";
 import type {DAOs} from "../models/DAOs.ts";
 import UserService from "./UserService.ts";
+import GameService from "./GameService.ts";
 
 class Service {
     users: UserService;
+    game: GameService;
     pool: Pool;
 
     private static instance: Service;
@@ -11,6 +13,7 @@ class Service {
     constructor(daos: DAOs, pool: Pool) {
         this.pool = pool;
         this.users = new UserService(daos, pool);
+        this.game = new GameService(daos, pool);
     }
 
     public static async init(DAOs: DAOs, pool: Pool) {
