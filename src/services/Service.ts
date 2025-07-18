@@ -2,9 +2,11 @@ import type {Pool} from "pg";
 import type {DAOs} from "../models/DAOs.ts";
 import UserService from "./UserService.ts";
 import GameService from "./GameService.ts";
+import BoardService from "./BoardService.ts";
 
 class Service {
     users: UserService;
+    boards: BoardService;
     game: GameService;
     pool: Pool;
 
@@ -13,6 +15,7 @@ class Service {
     constructor(daos: DAOs, pool: Pool) {
         this.pool = pool;
         this.users = new UserService(daos, pool);
+        this.boards = new BoardService(daos, pool);
         this.game = new GameService(daos, pool);
     }
 

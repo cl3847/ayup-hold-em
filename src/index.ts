@@ -15,6 +15,7 @@ import Service from "./services/Service.ts";
 import {getRandomCard} from "./utils/cards.ts";
 import ObjectDAO from "./handlers/ObjectDAO.ts";
 import initJobs from "./utils/jobs.ts";
+import BoardDAO from "./handlers/BoardDAO.ts";
 
 require('dotenv').config();
 
@@ -70,6 +71,7 @@ async function databaseSetup(): Promise<Pool> {
 async function serviceSetup(pool: Pool) {
     const daos: DAOs = {
         users: new UserDAO(),
+        boards: new BoardDAO(),
         objects: new ObjectDAO(),
     }
     await Service.init(daos, pool);

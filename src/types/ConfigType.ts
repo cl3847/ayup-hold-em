@@ -10,7 +10,7 @@ export type ConfigType = {
         startingBalance: number; // The starting balance for new users
     };
     initialGameState: {
-        date: number; // The initial day of the game
+        day: number; // The initial day of the game
         phase: number; // The initial phase of the game
     };
     colors: {

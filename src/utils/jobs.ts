@@ -2,7 +2,7 @@ import {Client, type TextChannel} from "discord.js";
 import * as cron from "node-cron";
 import Service from "../services/Service.ts";
 import log from "./logger.ts";
-import {getRandomCard, getRandomFlop} from "./cards.ts";
+import {cardMap} from "./cards.ts";
 import {config} from "../../config.ts";
 import type {GameState} from "../models/GameState.ts";
 
@@ -13,58 +13,65 @@ function initJobs(client: Client) {
 }
 
 async function runTheFlop(client: Client) {
-    const gameState = await Service.getInstance().game.getGameState();
+    const service = Service.getInstance();
+    let gameState = await service.game.getGameState();
     if (gameState.phase === 0) { // The river is done
-        const flop = getRandomFlop(); // implement this function to get a random flop
-        // TODO: Send the flop information to the backend
+        // Start a new board for the next day
         try {
-            const channel = await client.channels.fetch(config.bot.channels.dealer) as TextChannel;
-            await channel.send({
-               embeds: [
-                    {
-                        title: `Day ${gameState.day} | Flop Draw`,
-                        description: `FLOP: ${flop.map(card => card.shortName).join(' | ')}`,
-                        color: config.colors.red
-                    }
-                ]
-            });
+            const newBoard = await service.boards.createBoardIncrementDay();
+            gameState = await service.game.getGameState(); // Refresh the game state after creating a new board
+            const flop = [newBoard.flop1, newBoard.flop2, newBoard.flop3];
+            try {
+                const channel = await client.channels.fetch(config.bot.channels.dealer) as TextChannel;
+                await channel.send({
+                    embeds: [
+                        {
+                            title: `Day ${gameState.day} | Flop Draw`,
+                            description: `FLOP: ${flop.map(code => cardMap.get(code)!.shortName).join(' | ')}`,
+                            color: config.colors.red
+                        }
+                    ]
+                });
+                log.info("Flop draw sent to dealer channel.");
 
-            // Update the game state to reflect the flop draw
-            await Service.getInstance().game.updateGameState({
-                phase: 1, // Update to the next phase after flop
-                day: gameState.day + 1 // Increment the date
-            });
+                // Update the game state to reflect the flop draw
+                gameState.phase = 1;
+                await Service.getInstance().game.updateGameState(gameState);
+            } catch (err) {
+                log.error("Could not send Flop to dealer channel.");
+                log.error(err);
+            }
         } catch (err) {
-            log.error("Could not send Flop to dealer channel.");
+            log.error("Could not create a new board for the next day.");
             log.error(err);
         }
-
     } else {
         log.error("Game phase mismatch, skipping Flop draw.");
     }
 }
 
 async function runTheTurn(client: Client) {
-    const gameState: GameState = await Service.getInstance().game.getGameState();
-    if (gameState.phase === 1) { // The flop is done
-        const turn = getRandomCard(); // implement this function to get a random turn card
+    const service = Service.getInstance();
+    const gameState: GameState = await service.game.getGameState();
+    const board = await service.boards.getBoard(gameState.day);
+    if (gameState.phase === 1 && board) { // The flop is done and we have a board
+        const turn = cardMap.get(board.turn)!;
         try {
             const channel = await client.channels.fetch(config.bot.channels.dealer) as TextChannel;
             await channel.send({
                 embeds: [
                     {
                         title: `Day ${gameState.day} | Turn Draw`,
-                        description: `THE TURN: ${turn.shortName}`,
+                        description: `THE TURN: ${turn?.shortName}`,
                         color: config.colors.red
                     }
                 ]
             });
+            log.info("Turn draw sent to dealer channel.");
 
             // Update the game state to reflect the turn draw
-            await Service.getInstance().game.updateGameState({
-                phase: 2, // Update to the next phase after turn
-                day: gameState.day
-            });
+            gameState.phase = 2;
+            await Service.getInstance().game.updateGameState(gameState);
         } catch (err) {
             log.error("Could not send Turn to dealer channel.");
             log.error(err);
@@ -75,10 +82,11 @@ async function runTheTurn(client: Client) {
 }
 
 async function runTheRiver(client: Client) {
-    const gameState = await Service.getInstance().game.getGameState();
-    if (gameState.phase === 2) { // The turn is done TODO: Change this to the correct phase
-        const river = getRandomCard(); // implement this function to get a random flop
-        // TODO: Send the river information to the backend
+    const service = Service.getInstance();
+    const gameState: GameState = await service.game.getGameState();
+    const board = await service.boards.getBoard(gameState.day);
+    if (gameState.phase === 2 && board) { // The turn is done
+        const river = cardMap.get(board.river)!;
         try {
             const channel = await client.channels.fetch(config.bot.channels.dealer) as TextChannel;
             await channel.send({
@@ -90,12 +98,11 @@ async function runTheRiver(client: Client) {
                     }
                 ]
             });
+            log.info("River draw sent to dealer channel.");
 
             // Update the game state to reflect the river draw
-            await Service.getInstance().game.updateGameState({
-                phase: 0, // Reset to the initial phase after river
-                day: gameState.day
-            });
+            gameState.phase = 0;
+            await Service.getInstance().game.updateGameState(gameState);
         } catch (err) {
             log.error("Could not send River to dealer channel.");
             log.error(err);

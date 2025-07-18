@@ -14,7 +14,7 @@ export const config: ConfigType = {
         "startingBalance": 0, // The starting balance for new users
     },
     "initialGameState": {
-        "date": 1, // The initial day of the game
+        "day": 0, // The initial day of the game
         "phase": 0, // The initial phase of the game
     },
     "colors": {

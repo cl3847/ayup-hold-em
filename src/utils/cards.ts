@@ -76,9 +76,12 @@ const getRandomCard = (): Card => {
     return cardList[randomIndex]!;
 }
 
-const getRandomFlop = (): Card[] => {
+/**
+ * Returns a random hand of 5 cards from the cardList.
+ */
+const getRandomHand = (): Card[] => {
     const shuffledCards = [...cardList].sort(() => Math.random() - 0.5);
-    return shuffledCards.slice(0, 3);
+    return shuffledCards.slice(0, 5);
 }
 
-export {cardMap, cardList, getRandomCard, getRandomFlop};
+export {cardMap, cardList, getRandomCard, getRandomHand};
