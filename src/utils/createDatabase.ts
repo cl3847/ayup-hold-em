@@ -38,12 +38,22 @@ const initDb = async (pc: PoolClient) => {
     await createTable('users', `
         CREATE TABLE users (
             uid TEXT PRIMARY KEY,
-            balance INT NOT NULL DEFAULT 0,
-            hole1 card_code DEFAULT NULL,
-            hole2 card_code DEFAULT NULL
+            balance INT NOT NULL DEFAULT 0
         );`
     );
 
+    await createTable('users_boards', `
+        CREATE TABLE users_boards (
+            uid TEXT NOT NULL,
+            day INT NOT NULL,
+            hole1 card_code NOT NULL,
+            hole2 card_code NOT NULL,
+            PRIMARY KEY (uid, day),
+            FOREIGN KEY (uid) REFERENCES users(uid) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (day) REFERENCES boards(day) ON UPDATE CASCADE ON DELETE CASCADE
+        );`
+    );
+    
     await createTable('objects', `
         CREATE TABLE objects (
             name TEXT PRIMARY KEY,

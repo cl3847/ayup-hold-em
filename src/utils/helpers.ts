@@ -4,11 +4,14 @@ import {
     ButtonBuilder,
     ButtonStyle,
     type CacheType,
+    Client,
     type CommandInteraction,
     EmbedBuilder,
     type InteractionReplyOptions,
-    MessageFlags
+    MessageFlags, type TextChannel
 } from "discord.js";
+import {config} from "../../config.ts";
+import log from "./logger.ts";
 
 /**
  * Handles an interaction to create an embed navigator.
@@ -81,4 +84,14 @@ async function handleEmbedNavigator(interaction: CommandInteraction<CacheType>, 
     });
 }
 
-export {handleEmbedNavigator};
+async function logToChannel(client: Client, text: string) {
+    if (!config.bot.channels.log) return;
+    try {
+        const channel = await client.channels.fetch(config.bot.channels.log) as TextChannel;
+        await channel.send(text)
+    } catch (err) {
+        log.error("Error logging event to log channel: " + text)
+    }
+}
+
+export {handleEmbedNavigator, logToChannel};

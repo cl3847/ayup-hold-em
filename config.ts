@@ -7,7 +7,8 @@ export const config: ConfigType = {
         "clientID": process.env.CLIENT_ID ?? "1245583548258451516", // The client ID of the bot
         "guildID": "1245589131405299802", // The guild ID of the bot
         "channels": {
-            "dealer": "1395227013765267566"
+            "dealer": "1395227013765267566",
+            "log": "1395975476278857728"
         }
     },
     "game": {

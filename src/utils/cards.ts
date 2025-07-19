@@ -80,8 +80,20 @@ const getRandomCard = (): Card => {
  * Returns a random hand of 5 cards from the cardList.
  */
 const getRandomHand = (): Card[] => {
-    const shuffledCards = [...cardList].sort(() => Math.random() - 0.5);
-    return shuffledCards.slice(0, 5);
+    return drawRandomNCards(5);
 }
 
-export {cardMap, cardList, getRandomCard, getRandomHand};
+/**
+ * Draws a specified number of cards from the cardList.
+ * @param n - The number of cards to draw.
+ * @returns {Card[]} An array of Card objects.
+ */
+const drawRandomNCards = (n: number): Card[] => {
+    if (n < 1 || n > cardList.length) {
+        throw new Error("Invalid number of cards requested.");
+    }
+    const shuffledCards = [...cardList].sort(() => Math.random() - 0.5);
+    return shuffledCards.slice(0, n);
+}
+
+export {cardMap, cardList, getRandomCard, getRandomHand, drawRandomNCards};

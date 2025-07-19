@@ -4,6 +4,7 @@ export type ConfigType = {
         guildID: string; // The guild ID of the bot
         channels: {
             dealer: string; // The channel ID for the dealer
+            log: string; // The channel ID for logging events
         };
     };
     game: {

@@ -1,5 +1,8 @@
 import type {User} from "../models/user/User.ts";
 import type {PoolClient} from "pg";
+import UserHand from "../models/user/UserHand.ts";
+import type {UserBoard} from "../models/user/UserBoard.ts";
+import type {Board} from "../models/board/Board.ts";
 
 class UserDAO {
     /**
@@ -56,6 +59,23 @@ class UserDAO {
     public async deleteUser(pc: PoolClient, uid: string): Promise<void> {
         const query = "DELETE FROM users WHERE uid = $1";
         const params = [uid];
+        await pc.query(query, params);
+    }
+
+    public async getUserHandOnDay(pc: PoolClient, uid: string, day: number): Promise<UserHand | null> {
+        const query = "SELECT row_to_json(u.*) as profile, row_to_json(ub.*) as userboard, row_to_json(b.*) as board FROM users as u NATURAL JOIN users_boards as ub NATURAL JOIN boards as b WHERE uid = $1 AND day = $2";
+        const params = [uid, day];
+        const result = await pc.query(query, params);
+        if (result.rowCount === 0) return null; // No user hand found for the given UID and day
+        return new UserHand(result.rows[0].profile as User, result.rows[0].userboard as UserBoard, result.rows[0].board as Board) || null;
+    }
+
+    public async createUserBoard(pc: PoolClient, userBoard: UserBoard): Promise<void> {
+        const keyString = Object.keys(userBoard).join(", ");
+        const valueString = Object.keys(userBoard).map((_, index) => `$${index + 1}`).join(", ");
+        const query = `INSERT INTO users_boards (${keyString})
+                       VALUES (${valueString})`;
+        const params = Object.values(userBoard);
         await pc.query(query, params);
     }
 }
