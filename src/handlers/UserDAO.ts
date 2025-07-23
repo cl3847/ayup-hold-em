@@ -49,7 +49,6 @@ class UserDAO {
         await pc.query(query, params);
     }
 
-
     /**
      * Deletes a user corresponding to a specific UID
      * @param pc {PoolClient} A Postgres Client
@@ -76,6 +75,15 @@ class UserDAO {
         const query = `INSERT INTO users_boards (${keyString})
                        VALUES (${valueString})`;
         const params = Object.values(userBoard);
+        await pc.query(query, params);
+    }
+
+    public async updateUserBoard(pc: PoolClient, userBoard: UserBoard): Promise<void> {
+        const fields = Object.keys(userBoard).map((key, index) => `${key} = $${index + 1}`).join(", ");
+        const query = `UPDATE users_boards
+                       SET ${fields}
+                       WHERE uid = $${Object.keys(userBoard).length + 1} AND day = $${Object.keys(userBoard).length + 2}`;
+        const params = [...Object.values(userBoard), userBoard.uid, userBoard.day];
         await pc.query(query, params);
     }
 }

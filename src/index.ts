@@ -1,5 +1,5 @@
 import log from './utils/logger.ts';
-import {Client, Collection, Events, IntentsBitField, REST} from "discord.js";
+import {Client, Collection, Events, IntentsBitField, MessageFlags, REST} from "discord.js";
 import {Pool, types} from "pg";
 // @ts-ignore
 import {Routes} from "discord-api-types/v9";
@@ -50,7 +50,7 @@ async function databaseSetup(): Promise<Pool> {
 
     types.setTypeParser(20, (val) => parseInt(val, 10)); // parse int8 as number
 
-    // test connection to database, and initialize tables if not created
+    // test connection to the database, and initialize tables if not created
     try {
         const pc = await pool.connect();
         log.success("Connected to Postgres database.");
@@ -126,12 +126,12 @@ async function discordSetup(): Promise<Client> {
                 if (interaction.replied || interaction.deferred) {
                     await interaction.followUp({
                         content: 'There was an error while executing this command!',
-                        ephemeral: true
+                        flags: MessageFlags.Ephemeral
                     });
                 } else {
                     await interaction.reply({
                         content: 'There was an error while executing this command!',
-                        ephemeral: true
+                        flags: MessageFlags.Ephemeral
                     });
                 }
             }
