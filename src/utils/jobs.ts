@@ -8,9 +8,9 @@ import type {GameState} from "../models/GameState.ts";
 import {renderBoard} from "./render.ts";
 
 function initJobs(client: Client) {
-    cron.schedule('00 4 * * *', () => runTheFlop(client)); // draw the flop every day at midnight (4 AM UTC)
-    cron.schedule('00 16 * * *', () => runTheTurn(client)); // draw the turn every day at noon (4 PM UTC)
-    cron.schedule('00 3 * * *', () => runTheRiver(client)); // draw the river every day at 11 PM (3 AM UTC)
+    cron.schedule('00 0 * * *', () => runTheFlop(client)); // draw the flop every day at midnight (4 AM UTC)
+    cron.schedule('00 12 * * *', () => runTheTurn(client)); // draw the turn every day at noon (4 PM UTC)
+    cron.schedule('00 13 * * *', () => runTheRiver(client)); // draw the river every day at 11 PM (3 AM UTC)
 }
 
 async function runTheFlop(client: Client) {
