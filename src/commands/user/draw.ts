@@ -1,7 +1,7 @@
 import {type CacheType, type ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
 import type {CommandType} from "../../types/CommandType.ts";
 import Service from "../../services/Service.ts";
-import {cardMap, drawRandomNCards} from "../../utils/cards.ts";
+import {drawRandomNCards} from "../../utils/cards.ts";
 import type {UserBoard} from "../../models/user/UserBoard.ts";
 import {logToChannel} from "../../utils/helpers.ts";
 
@@ -49,7 +49,7 @@ const command: CommandType = {
 
         // Reply with the drawn cards
         if (!hand) throw new Error("User hand should not be null after drawing cards, but it is.");
-        await interaction.reply(`Your daily hole cards are: ${cardMap.get(hand.hole1)!.shortName} | ${cardMap.get(hand.hole2)!.shortName}`);
+        await interaction.reply(`Your daily hole cards are: ${hand.hole1.shortName} | ${hand.hole2.shortName}`);
     },
 };
 
