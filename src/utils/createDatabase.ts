@@ -2,6 +2,7 @@ import type {PoolClient} from "pg";
 import log from "./logger";
 import {cardMap} from "./cards.ts";
 import {config} from "../../config.ts";
+import {tarotList} from "./tarots.ts";
 
 /**
  * Initializes the database by checking for the existence of required tables and creating them if they do not exist.
@@ -22,7 +23,7 @@ const initDb = async (pc: PoolClient) => {
         }
     };
 
-    // ensure the card enum exists
+    // ensure the card codes enum exists
     const cardEnumCheck = await pc.query("SELECT 1 FROM pg_type WHERE typname = 'card_code'");
     if (cardEnumCheck.rowCount === 0) {
         log.info("Enum 'card_code' not found. Creating...");
@@ -32,6 +33,17 @@ const initDb = async (pc: PoolClient) => {
 
         await pc.query(createEnumQuery);
         log.success("Successfully created enum 'card_code'.");
+    }
+
+    // ensure the tarot codes enum exists
+    const tarotEnumCheck = await pc.query("SELECT 1 FROM pg_type WHERE typname = 'tarot_code'");
+    if (tarotEnumCheck.rowCount === 0) {
+        log.info("Enum 'tarot_code' not found. Creating...");
+        const tarotValues = tarotList.map(tarot => `'${tarot.code}'`).join(', ');
+        const createTarotQuery = `CREATE TYPE tarot_code AS ENUM (${tarotValues});`;
+
+        await pc.query(createTarotQuery);
+        log.success("Successfully created enum 'tarot_code'.");
     }
 
     // Execute checks and creation

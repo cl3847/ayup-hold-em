@@ -1,0 +1,56 @@
+export enum MajorArcana {
+    FOOL = "fool",
+    MAGICIAN = "magician",
+    HIGH_PRIESTESS = "high_priestess",
+    EMPRESS = "empress",
+    EMPEROR = "emperor",
+    HIEROPHANT = "hierophant",
+    LOVERS = "lovers",
+    CHARIOT = "chariot",
+    STRENGTH = "strength",
+    HERMIT = "hermit",
+    WHEEL_OF_FORTUNE = "wheel_of_fortune",
+    JUSTICE = "justice",
+    HANGED_MAN = "hanged_man",
+    DEATH = "death",
+    TEMPERANCE = "temperance",
+    DEVIL = "devil",
+    TOWER = "tower",
+    STAR = "star",
+    MOON = "moon",
+    SUN = "sun",
+    JUDGEMENT = "judgement",
+    WORLD = "world",
+}
+
+export const majorArcanaList = Object.values(MajorArcana);
+
+export const tarotList = [
+    {code: MajorArcana.FOOL, name: "Fool"},
+    {code: MajorArcana.MAGICIAN, name: "Magician"},
+    {code: MajorArcana.HIGH_PRIESTESS, name: "High Priestess"},
+    {code: MajorArcana.EMPRESS, name: "Empress"},
+    {code: MajorArcana.EMPEROR, name: "Emperor"},
+    {code: MajorArcana.HIEROPHANT, name: "Hierophant"},
+    {code: MajorArcana.LOVERS, name: "Lovers"},
+    {code: MajorArcana.CHARIOT, name: "Chariot"},
+    {code: MajorArcana.STRENGTH, name: "Strength"},
+    {code: MajorArcana.HERMIT, name: "Hermit"},
+    {code: MajorArcana.WHEEL_OF_FORTUNE, name: "Wheel of Fortune"},
+    {code: MajorArcana.JUSTICE, name: "Justice"},
+    {code: MajorArcana.HANGED_MAN, name: "Hanged Man"},
+    {code: MajorArcana.DEATH, name: "Death"},
+    {code: MajorArcana.TEMPERANCE, name: "Temperance"},
+    {code: MajorArcana.DEVIL, name: "Devil"},
+    {code: MajorArcana.TOWER, name: "Tower"},
+    {code: MajorArcana.STAR, name: "Star"},
+    {code: MajorArcana.MOON, name: "Moon"},
+    {code: MajorArcana.SUN, name: "Sun"},
+    {code: MajorArcana.JUDGEMENT, name: "Judgement"},
+    {code: MajorArcana.WORLD, name: "World"},
+];
+
+const tarotMap = new Map<string, { code: MajorArcana, name: string }>();
+tarotList.forEach(c => {
+    tarotMap.set(c.code, c);
+});
