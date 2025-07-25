@@ -42,6 +42,13 @@ class UserService {
         return res;
     }
 
+    public async getAllUsers(): Promise<User[]> {
+        const pc = await this.pool.connect();
+        const res = await this.daos.users.getAllUsers(pc);
+        pc.release();
+        return res;
+    }
+
     public async createUser(user: User): Promise<void> {
         const pc = await this.pool.connect();
         const res = await this.daos.users.createUser(pc, user);

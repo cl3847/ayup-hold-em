@@ -33,6 +33,12 @@ class UserDAO {
         return result.rows[0] || null;
     }
 
+    public async getAllUsers(pc: PoolClient): Promise<User[]> {
+        const query = "SELECT * FROM users";
+        const result = await pc.query(query);
+        return result.rows as User[];
+    }
+
     /**
      * Updates a user corresponding to a specific UID
      * @param pc {PoolClient} A Postgres Client

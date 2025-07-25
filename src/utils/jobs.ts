@@ -2,10 +2,11 @@ import {AttachmentBuilder, Client, EmbedBuilder, type TextChannel} from "discord
 import * as cron from "node-cron";
 import Service from "../services/Service.ts";
 import log from "./logger.ts";
-import {cardMap} from "./cards.ts";
+import {cardMap, drawRandomNCards} from "./cards.ts";
 import {config} from "../../config.ts";
 import type {GameState} from "../models/GameState.ts";
 import {renderBoard} from "./render.ts";
+import type {UserBoard} from "../models/user/UserBoard.ts";
 
 function initJobs(client: Client) {
     cron.schedule('00 0 * * *', () => runTheFlop(client)); // draw the flop every day at midnight (4 AM UTC)
@@ -17,10 +18,15 @@ async function runTheFlop(client: Client) {
     const service = Service.getInstance();
     let gameState = await service.game.getGameState();
     if (gameState.phase === 0) { // The river is done
+        log.info("Drawing the flop.");
         // Start a new board for the next day
         try {
             const newBoard = await service.boards.createBoardIncrementDay();
             gameState = await service.game.getGameState(); // Refresh the game state after creating a new board
+
+            // Draw hole cards for all users for the new day
+            await drawAllUserHoleCards();
+
             const flop = [newBoard.flop1, newBoard.flop2, newBoard.flop3].map(code => cardMap.get(code)!);
             try {
                 const channel = await client.channels.fetch(config.bot.channels.dealer) as TextChannel;
@@ -58,6 +64,7 @@ async function runTheTurn(client: Client) {
     const gameState: GameState = await service.game.getGameState();
     const board = await service.boards.getBoard(gameState.day);
     if (gameState.phase === 1 && board) { // The flop is done and we have a board
+        log.info("Drawing the turn.");
         const turn = cardMap.get(board.turn)!;
         const communityDisplayableCards = [board.flop1, board.flop2, board.flop3, board.turn].map(code => cardMap.get(code)!);
         try {
@@ -92,6 +99,7 @@ async function runTheRiver(client: Client) {
     const gameState: GameState = await service.game.getGameState();
     const board = await service.boards.getBoard(gameState.day);
     if (gameState.phase === 2 && board) { // The turn is done
+        log.info("Drawing the river.");
         const river = cardMap.get(board.river)!;
         const communityDisplayableCards = [board.flop1, board.flop2, board.flop3, board.turn, board.river].map(code => cardMap.get(code)!);
         try {
@@ -118,6 +126,33 @@ async function runTheRiver(client: Client) {
         }
     } else {
         log.error("Game phase mismatch, skipping River draw.");
+    }
+}
+
+async function drawAllUserHoleCards() {
+    const service = Service.getInstance();
+    const gameState = await service.game.getGameState();
+    if (gameState.phase === 0) { // Starting a new day
+        log.info("Drawing hole cards for all users for the new day.");
+        const users = await service.users.getAllUsers();
+        for (const user of users) {
+            try {
+                const newHoleCards = drawRandomNCards(2);
+                const newUserBoard: UserBoard = {
+                    uid: user.uid,
+                    day: gameState.day, // Increment the day for the new board
+                    hole1: newHoleCards[0]!.code,
+                    hole2: newHoleCards[1]!.code,
+                };
+                await service.users.createUserBoard(newUserBoard);
+            } catch (err) {
+                log.error(`Failed to draw hole cards for user ${user.uid}`);
+                log.error(err);
+            }
+        }
+        log.info("All users' hole cards have been drawn for the new day.");
+    } else {
+        log.error("Game phase mismatch, skipping drawing all user hole cards.");
     }
 }
 

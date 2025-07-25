@@ -94,4 +94,14 @@ async function logToChannel(client: Client, text: string) {
     }
 }
 
-export {handleEmbedNavigator, logToChannel};
+async function errorInteractionReply(interaction: CommandInteraction<CacheType>, errorMessage: string, ephemeral: boolean = true): Promise<void> {
+    await interaction.reply({
+        embeds: [{
+            description: errorMessage,
+            color: config.colors.red
+        }],
+        flags: ephemeral ? MessageFlags.Ephemeral : undefined,
+    });
+}
+
+export {handleEmbedNavigator, logToChannel, errorInteractionReply};

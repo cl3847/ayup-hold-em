@@ -34,6 +34,22 @@ class UserHand implements User {
         this.turn = cardMap.get(board.turn)!;
         this.river = cardMap.get(board.river)!;
     }
+
+    /**
+     * Returns the user's hole cards as an array.
+     * @returns {Card[]} An array containing the user's hole cards.
+     */
+    public getHoleCards(): Card[] {
+        return [this.hole1, this.hole2];
+    }
+
+    /**
+     * Returns the community cards as an array.
+     * @returns {Card[]} An array containing the community cards (flop1, flop2, flop3, turn, river).
+     */
+    public getCommunityCards(): Card[] {
+        return [this.flop1, this.flop2, this.flop3, this.turn, this.river];
+    }
 }
 
 export default UserHand;
