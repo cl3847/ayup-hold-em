@@ -87,6 +87,15 @@ const initDb = async (pc: PoolClient) => {
         );`
     );
 
+    await createTable('users_tarots', `
+        CREATE TABLE users_tarots (
+            uid TEXT NOT NULL,
+            tarot tarot_code NOT NULL,
+            PRIMARY KEY (uid, tarot),
+            FOREIGN KEY (uid) REFERENCES users(uid) ON UPDATE CASCADE ON DELETE CASCADE
+        );`
+    );
+
     // check if gameState exists in objects
     const gameStateCheck = await pc.query(`SELECT * FROM objects WHERE name = 'gameState';`);
     if (gameStateCheck.rowCount === 0) {
