@@ -3,6 +3,7 @@ import type {Board} from "../board/Board.ts";
 import type {UserBoard} from "./UserBoard.ts";
 import type {Card} from "../../types/CardType.ts";
 import {cardMap} from "../../utils/cards.ts";
+import Service from "../../services/Service.ts";
 
 /**
  * A class containing all the information in a User, their hand, and the community cards for a specific day.
@@ -49,6 +50,15 @@ class UserHand implements User {
      */
     public getCommunityCards(): Card[] {
         return [this.flop1, this.flop2, this.flop3, this.turn, this.river];
+    }
+
+    /**
+     * Returns the showable community cards based on the current game phase.
+     */
+    public async getShowableCommunityCards(): Promise<Card[]> {
+        const gameState = await Service.getInstance().game.getGameState();
+        const showableCommunityCardLength = gameState.phase === 1 ? 3 : gameState.phase === 2 ? 4 : 5;
+        return this.getCommunityCards().slice(0, showableCommunityCardLength);
     }
 }
 

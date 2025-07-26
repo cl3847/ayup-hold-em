@@ -1,8 +1,9 @@
-import {type CacheType, type ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
+import {AttachmentBuilder, type CacheType, type ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
 import type {CommandType} from "../../types/CommandType.ts";
 import Service from "../../services/Service.ts";
 import {errorInteractionReply} from "../../utils/helpers.ts";
 import {config} from "../../../config.ts";
+import {renderUserHand} from "../../utils/render.ts";
 
 const command: CommandType = {
     data: new SlashCommandBuilder()
@@ -32,7 +33,10 @@ const command: CommandType = {
         }
 
         // Reply with the user's hand and community cards
-        const showableCommunityCardLength = gameState.phase === 1 ? 3 : gameState.phase === 2 ? 4 : 5;
+        const handImage = await renderUserHand(hand);
+        const handImageAttachment = new AttachmentBuilder(handImage, {name: 'hand.png'});
+
+        const showableCommunityCards = await hand.getShowableCommunityCards();
         const embed = {
             title: `${discordUser.username}'s Hand for Day ${gameState.day}`,
             fields: [
@@ -42,14 +46,17 @@ const command: CommandType = {
                 },
                 {
                     "name": "Community Cards",
-                    "value": hand.getCommunityCards().map(card => card.shortName).slice(0, showableCommunityCardLength).join(' | '),
+                    "value": showableCommunityCards.map(card => card.shortName).join(' | '),
                 },
 
             ],
             color: config.colors.blue, // Red color
+            image: {
+                url: 'attachment://hand.png', // The image will be attached with this name
+            },
         }
 
-        await interaction.reply({embeds: [embed]});
+        await interaction.reply({embeds: [embed], files: [handImageAttachment]});
     },
 };
 
