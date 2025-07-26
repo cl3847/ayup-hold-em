@@ -6,6 +6,7 @@ import type UserHand from "../models/user/UserHand.ts";
 import type {GameState} from "../models/GameState.ts";
 import type {UserBoard} from "../models/user/UserBoard.ts";
 import log from "../utils/logger.ts";
+import {drawRandomNCards} from "../utils/cards.ts";
 
 class UserService {
     private daos: DAOs;
@@ -25,7 +26,19 @@ class UserService {
                 balance: config.game.startingBalance,
             };
             await this.daos.users.createUser(pc, newUser);
-            // TODO: Initialize the user's cards and items if necessary
+
+            // Initialize the user's board for the current day with random hole cards
+            const randomHoleCards = drawRandomNCards(2);
+            const newUserBoard: UserBoard = {
+                uid,
+                day: 1, // Start on day 1
+                hole1: randomHoleCards[0]!.code, // Placeholder, will be set when the user draws their cards
+                hole2: randomHoleCards[1]!.code, // Placeholder, will be set when the user draws their cards
+                tarot1: null, // No tarot card drawn initially
+                tarot2: null, // No tarot card drawn initially
+            }
+            await this.daos.users.createUserBoard(pc, newUserBoard);
+
             await pc.query("COMMIT");
         } catch (err) {
             await pc.query('ROLLBACK');
@@ -101,29 +114,31 @@ class UserService {
         try {
             await pc.query("BEGIN");
             // Get the current user boards
-            const userBoard1 = await this.getUserHandToday(uid1);
-            const userBoard2 = await this.getUserHandToday(uid2);
+            const userHand1 = await this.getUserHandToday(uid1);
+            const userHand2 = await this.getUserHandToday(uid2);
 
-            if (!userBoard1 || !userBoard2) {
+            if (!userHand1 || !userHand2) {
                 throw new Error("One or both users do not have a hand drawn for today.");
             }
 
             // Swap the cards
-            const card1 = u1cardIndex === 1 ? userBoard1.hole1 : userBoard1.hole2;
-            const card2 = u2cardIndex === 1 ? userBoard2.hole1 : userBoard2.hole2;
+            const card1 = u1cardIndex === 1 ? userHand1.hole1 : userHand1.hole2;
+            const card2 = u2cardIndex === 1 ? userHand2.hole1 : userHand2.hole2;
 
-            const newUserBoard1: UserBoard = {
-                uid: uid1,
-                day: userBoard1.day,
-                hole1: u1cardIndex === 1 ? card2.code : userBoard1.hole1.code,
-                hole2: u1cardIndex === 2 ? card2.code : userBoard1.hole2.code,
-            };
-            const newUserBoard2: UserBoard = {
-                uid: uid2,
-                day: userBoard2.day,
-                hole1: u2cardIndex === 1 ? card1.code : userBoard2.hole1.code,
-                hole2: u2cardIndex === 2 ? card1.code : userBoard2.hole2.code,
-            };
+            const newUserBoard1 = userHand1.toUserBoard();
+            const newUserBoard2 = userHand2.toUserBoard();
+            // Update the hole cards in the user boards
+            if (u1cardIndex === 1) {
+                newUserBoard1.hole1 = card2.code;
+            } else {
+                newUserBoard1.hole2 = card2.code;
+            }
+
+            if (u2cardIndex === 1) {
+                newUserBoard2.hole1 = card1.code;
+            } else {
+                newUserBoard2.hole2 = card1.code;
+            }
 
             // Update the user boards in the database
             await this.daos.users.updateUserBoard(pc, newUserBoard1);

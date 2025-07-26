@@ -137,14 +137,24 @@ async function drawAllUserHoleCards() {
         const users = await service.users.getAllUsers();
         for (const user of users) {
             try {
+                // If the user had tarot cards in the previous day, we keep them
+                const previousUserBoard = await service.users.getUserHandOnDay(user.uid, gameState.day - 1);
                 const newHoleCards = drawRandomNCards(2);
                 const newUserBoard: UserBoard = {
                     uid: user.uid,
                     day: gameState.day, // Increment the day for the new board
                     hole1: newHoleCards[0]!.code,
                     hole2: newHoleCards[1]!.code,
+                    tarot1: previousUserBoard?.tarot1?.code ?? null, // Keep the previous tarot card if exists
+                    tarot2: previousUserBoard?.tarot2?.code ?? null,
                 };
-                await service.users.createUserBoard(newUserBoard);
+
+
+                if (previousUserBoard) {
+
+                }
+
+                await service.users.createUserBoard(newUserBoard );
             } catch (err) {
                 log.error(`Failed to draw hole cards for user ${user.uid}`);
                 log.error(err);

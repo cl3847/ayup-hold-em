@@ -1,31 +1,6 @@
-export enum MajorArcana {
-    FOOL = "fool",
-    MAGICIAN = "magician",
-    HIGH_PRIESTESS = "high_priestess",
-    EMPRESS = "empress",
-    EMPEROR = "emperor",
-    HIEROPHANT = "hierophant",
-    LOVERS = "lovers",
-    CHARIOT = "chariot",
-    STRENGTH = "strength",
-    HERMIT = "hermit",
-    WHEEL_OF_FORTUNE = "wheel_of_fortune",
-    JUSTICE = "justice",
-    HANGED_MAN = "hanged_man",
-    DEATH = "death",
-    TEMPERANCE = "temperance",
-    DEVIL = "devil",
-    TOWER = "tower",
-    STAR = "star",
-    MOON = "moon",
-    SUN = "sun",
-    JUDGEMENT = "judgement",
-    WORLD = "world",
-}
+import {MajorArcana, type Tarot} from "../types/TarotType.ts";
 
-export const majorArcanaList = Object.values(MajorArcana);
-
-export const tarotList = [
+export const tarotList: Tarot[] = [
     {code: MajorArcana.FOOL, name: "Fool"},
     {code: MajorArcana.MAGICIAN, name: "Magician"},
     {code: MajorArcana.HIGH_PRIESTESS, name: "High Priestess"},
@@ -50,7 +25,7 @@ export const tarotList = [
     {code: MajorArcana.WORLD, name: "World"},
 ];
 
-const tarotMap = new Map<string, { code: MajorArcana, name: string }>();
+export const tarotMap = new Map<string, { code: MajorArcana, name: string }>();
 tarotList.forEach(c => {
     tarotMap.set(c.code, c);
 });
