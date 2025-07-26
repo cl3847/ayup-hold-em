@@ -5,4 +5,5 @@ export interface UserBoard {
     hole2: string;
     tarot1: string | null;
     tarot2: string | null;
+    tarot3: string | null;
 }

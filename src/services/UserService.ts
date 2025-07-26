@@ -36,6 +36,7 @@ class UserService {
                 hole2: randomHoleCards[1]!.code, // Placeholder, will be set when the user draws their cards
                 tarot1: null, // No tarot card drawn initially
                 tarot2: null, // No tarot card drawn initially
+                tarot3: null, // No tarot card drawn initially
             }
             await this.daos.users.createUserBoard(pc, newUserBoard);
 

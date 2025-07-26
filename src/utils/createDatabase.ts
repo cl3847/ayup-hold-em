@@ -80,6 +80,7 @@ const initDb = async (pc: PoolClient) => {
             hole2 card_code NOT NULL,
             tarot1 tarot_code,
             tarot2 tarot_code,
+            tarot3 tarot_code,
             PRIMARY KEY (uid, day),
             FOREIGN KEY (uid) REFERENCES users(uid) ON UPDATE CASCADE ON DELETE CASCADE,
             FOREIGN KEY (day) REFERENCES boards(day) ON UPDATE CASCADE ON DELETE CASCADE

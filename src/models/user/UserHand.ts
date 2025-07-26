@@ -18,6 +18,7 @@ class UserHand implements User {
     hole2!: Card;
     tarot1: Tarot | null;
     tarot2: Tarot | null;
+    tarot3: Tarot | null;
 
     day!: number;
     flop1!: Card;
@@ -34,6 +35,7 @@ class UserHand implements User {
         this.hole2 = cardMap.get(userBoard.hole2)!;
         this.tarot1 = userBoard.tarot1 ? tarotMap.get(userBoard.tarot1)! : null;
         this.tarot2 = userBoard.tarot2 ? tarotMap.get(userBoard.tarot2)! : null;
+        this.tarot3 = userBoard.tarot3 ? tarotMap.get(userBoard.tarot3)! : null;
 
         this.flop1 = cardMap.get(board.flop1)!;
         this.flop2 = cardMap.get(board.flop2)!;
@@ -50,6 +52,7 @@ class UserHand implements User {
             hole2: this.hole2.code,
             tarot1: this.tarot1 ? this.tarot1.code : null,
             tarot2: this.tarot2 ? this.tarot2.code : null,
+            tarot3: this.tarot3 ? this.tarot3.code : null,
         };
     }
 

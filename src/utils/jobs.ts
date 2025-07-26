@@ -147,6 +147,7 @@ async function drawAllUserHoleCards() {
                     hole2: newHoleCards[1]!.code,
                     tarot1: previousUserBoard?.tarot1?.code ?? null, // Keep the previous tarot card if exists
                     tarot2: previousUserBoard?.tarot2?.code ?? null,
+                    tarot3: previousUserBoard?.tarot3?.code ?? null, // Keep the previous tarot card if exists
                 };
 
 
