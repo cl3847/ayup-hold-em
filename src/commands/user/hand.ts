@@ -43,6 +43,12 @@ const command: CommandType = {
                 {
                     "name": "Hole Cards",
                     "value": hand.getHoleCards().map(card => card.shortName).join(' | '),
+                    "inline": true,
+                },
+                {
+                    "name": "Tarot Cards",
+                    "value": hand.getActiveTarots().map(tarot => tarot.name).join('\n') || 'No Tarot Cards',
+                    "inline": true,
                 },
                 {
                     "name": "Community Cards",
@@ -54,7 +60,7 @@ const command: CommandType = {
             image: {
                 url: 'attachment://hand.png', // The image will be attached with this name
             },
-        }
+        };
 
         await interaction.reply({embeds: [embed], files: [handImageAttachment]});
     },

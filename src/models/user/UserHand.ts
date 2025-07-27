@@ -4,7 +4,7 @@ import type {UserBoard} from "./UserBoard.ts";
 import type {Card} from "../../types/CardType.ts";
 import {cardMap} from "../../utils/cards.ts";
 import Service from "../../services/Service.ts";
-import type {Tarot} from "../../types/TarotType.ts";
+import {MajorArcana, type Tarot} from "../../types/TarotType.ts";
 import {tarotMap} from "../../utils/tarots.ts";
 
 /**
@@ -27,7 +27,9 @@ class UserHand implements User {
     turn!: Card;
     river!: Card;
 
-    constructor(user: User, userBoard: UserBoard, board: Board) {
+    tarotCollection: Tarot[];
+
+    constructor(user: User, userBoard: UserBoard, board: Board, tarotCollection: MajorArcana[] = []) {
         Object.assign(this, user);
         this.day = userBoard.day;
 
@@ -42,6 +44,8 @@ class UserHand implements User {
         this.flop3 = cardMap.get(board.flop3)!;
         this.turn = cardMap.get(board.turn)!;
         this.river = cardMap.get(board.river)!;
+
+        this.tarotCollection = tarotCollection.map(tarot => tarotMap.get(tarot)!);
     }
 
     public toUserBoard(): UserBoard {
@@ -79,6 +83,19 @@ class UserHand implements User {
         const gameState = await Service.getInstance().game.getGameState();
         const showableCommunityCardLength = gameState.phase === 1 ? 3 : gameState.phase === 2 ? 4 : 5;
         return this.getCommunityCards().slice(0, showableCommunityCardLength);
+    }
+
+    /**
+     * Returns the active tarot cards in the user's hand.
+     * @returns {Tarot[]} An array containing the active tarot cards (tarot1, tarot2, tarot3).
+     * If a tarot card is not set, it will not be included in the array.
+     */
+    public getActiveTarots(): Tarot[] {
+        const activeTarots: Tarot[] = [];
+        if (this.tarot1) activeTarots.push(this.tarot1);
+        if (this.tarot2) activeTarots.push(this.tarot2);
+        if (this.tarot3) activeTarots.push(this.tarot3);
+        return activeTarots;
     }
 }
 

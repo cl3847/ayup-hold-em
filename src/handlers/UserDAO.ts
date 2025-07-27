@@ -3,6 +3,7 @@ import type {PoolClient} from "pg";
 import UserHand from "../models/user/UserHand.ts";
 import type {UserBoard} from "../models/user/UserBoard.ts";
 import type {Board} from "../models/board/Board.ts";
+import type {MajorArcana} from "../types/TarotType.ts";
 
 class UserDAO {
     /**
@@ -67,12 +68,36 @@ class UserDAO {
         await pc.query(query, params);
     }
 
+    /**
+     * Gets a User (current day), with UserBoard and Board information for a specific day.
+     * Tarot collections, for example, are current day, but hole cards are from a specific day.
+     * @param pc {PoolClient} A Postgres Client
+     * @param uid {string} The UID of the user for which to get the hand
+     * @param day {number} The day for which to get the user's hand
+     */
     public async getUserHandOnDay(pc: PoolClient, uid: string, day: number): Promise<UserHand | null> {
-        const query = "SELECT row_to_json(u.*) as profile, row_to_json(ub.*) as userboard, row_to_json(b.*) as board FROM users as u NATURAL JOIN users_boards as ub NATURAL JOIN boards as b WHERE uid = $1 AND day = $2";
+        const query = `SELECT
+                           row_to_json(u.*) as profile,
+                           row_to_json(ub.*) as userboard,
+                           row_to_json(b.*) as board,
+                           COALESCE(
+                                   (SELECT json_agg(ut.tarot)
+                                    FROM users_tarots ut
+                                    WHERE ut.uid = u.uid),
+                                   '[]'
+                           ) as collection
+                       FROM
+                           users as u NATURAL JOIN users_boards as ub NATURAL JOIN boards as b
+                       WHERE u.uid = $1 AND b.day = $2;`;
         const params = [uid, day];
         const result = await pc.query(query, params);
         if (result.rowCount === 0) return null; // No user hand found for the given UID and day
-        return new UserHand(result.rows[0].profile as User, result.rows[0].userboard as UserBoard, result.rows[0].board as Board) || null;
+        return new UserHand(
+            result.rows[0].profile as User,
+            result.rows[0].userboard as UserBoard,
+            result.rows[0].board as Board,
+            result.rows[0].collection as MajorArcana[]
+        ) || null;
     }
 
     public async createUserBoard(pc: PoolClient, userBoard: UserBoard): Promise<void> {
